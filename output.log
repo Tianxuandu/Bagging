@@ -1,0 +1,369 @@
+
+models:   0%|          | 0/5 [00:00<?, ?it/s]
+train epochs:   0%|          | 0/10 [00:00<?, ?it/s]
+
+
+
+
+
+
+
+train batch: 15it [00:16,  1.04s/it]
+train epochs:  10%|█         | 1/10 [00:17<02:33, 17.10s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:44,  1.99s/it]
+train epochs:  20%|██        | 2/10 [01:01<04:24, 33.12s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:26,  1.63s/it]
+train epochs:  30%|███       | 3/10 [01:27<03:30, 30.02s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+train batch: 14it [00:23,  1.87s/it]
+train batch: 15it [00:24,  1.55s/it]
+train epochs:  40%|████      | 4/10 [01:52<02:47, 27.96s/it]
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:26,  1.34s/it]
+train epochs:  50%|█████     | 5/10 [02:19<02:17, 27.58s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+train batch: 14it [00:25,  1.95s/it]
+train batch: 15it [00:27,  2.11s/it]
+train epochs:  60%|██████    | 6/10 [02:47<01:50, 27.65s/it]
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:26,  2.26s/it]
+train epochs:  70%|███████   | 7/10 [03:13<01:21, 27.31s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+train batch: 14it [00:26,  1.98s/it]
+train batch: 15it [00:27,  1.64s/it]
+train epochs:  80%|████████  | 8/10 [03:41<00:54, 27.33s/it]
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:25,  1.39s/it]
+train epochs:  90%|█████████ | 9/10 [04:06<00:26, 26.70s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+train epochs: 100%|██████████| 10/10 [04:30<00:00, 27.05s/it]
+models:  20%|██        | 1/5 [04:32<18:11, 272.84s/it]85s/it]
+epochs:10/10,test_loss:1.6826,test_acc:22.2222%
+train epochs:   0%|          | 0/10 [00:00<?, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:45,  4.57s/it]
+test batch: 0it [00:00, ?it/s]
+train epochs:  10%|█         | 1/10 [00:45<06:47, 45.23s/it]
+
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [01:07,  1.81s/it]
+test batch: 0it [00:00, ?it/s]
+train epochs:  20%|██        | 2/10 [01:53<07:49, 58.71s/it]
+
+
+
+
+
+
+
+train batch: 14it [00:15,  1.14s/it]
+train batch: 15it [00:16,  1.05s/it]
+train epochs:  30%|███       | 3/10 [02:10<04:37, 39.68s/it]
+
+
+
+
+
+
+
+train batch: 15it [00:16,  1.04s/it]
+test batch: 0it [00:00, ?it/s]
+train epochs:  40%|████      | 4/10 [02:27<03:04, 30.71s/it]
+
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:37,  1.96s/it]
+train epochs:  50%|█████     | 5/10 [03:05<02:46, 33.30s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:25,  1.46s/it]
+train epochs:  60%|██████    | 6/10 [03:31<02:02, 30.74s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:23,  1.32s/it]
+train epochs:  70%|███████   | 7/10 [03:54<01:25, 28.51s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:25,  2.00s/it]
+train epochs:  80%|████████  | 8/10 [04:21<00:55, 27.77s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+train batch: 15it [00:26,  1.55s/it]
+train epochs:  90%|█████████ | 9/10 [04:47<00:27, 27.33s/it]
+train batch: 0it [00:00, ?it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+
+train batch: 14it [00:40,  3.19s/it]
+train epochs: 100%|██████████| 10/10 [05:33<00:00, 33.33s/it]
+models:  40%|████      | 2/5 [10:07<15:28, 309.45s/it]02s/it]
+epochs:1/10,test_loss:1.6062,test_acc:22.2222%
+epochs:2/10,test_loss:1.6054,test_acc:22.2222%
+epochs:3/10,test_loss:1.6039,test_acc:22.2222%
+epochs:4/10,test_loss:1.6012,test_acc:22.2222%
+epochs:5/10,test_loss:1.6002,test_acc:22.2222%
+epochs:6/10,test_loss:1.6147,test_acc:22.2222%
+epochs:7/10,test_loss:1.6385,test_acc:22.2222%
+epochs:8/10,test_loss:1.6642,test_acc:22.2222%
+epochs:9/10,test_loss:1.6703,test_acc:22.2222%
+train batch: 15it [00:00, 156.65it/s]5:28, 309.45s/it]02s/it]
+test batch: 1it [00:00, 333.30it/s] [00:00<?, ?it/s]
+train batch: 15it [00:00, 167.14it/s]
+test batch: 1it [00:00, 497.31it/s] [00:00<00:00,  9.92it/s]
+train batch: 15it [00:00, 260.84it/s]
+test batch: 1it [00:00, 1000.07it/s]
+train batch: 15it [00:00, 222.18it/s]
+test batch: 1it [00:00, 999.83it/s] [00:00<00:00, 11.86it/s]
+train batch: 15it [00:00, 309.03it/s]
+test batch: 1it [00:00, 1023.25it/s]
+train batch: 15it [00:00, 294.12it/s]
+test batch: 1it [00:00, 1000.55it/s][00:00<00:00, 13.87it/s]
+train batch: 15it [00:00, 193.32it/s]
+test batch: 1it [00:00, 499.98it/s]
+train batch: 15it [00:00, 227.83it/s]
+test batch: 1it [00:00, 499.80it/s] [00:00<00:00, 14.32it/s]
+train batch: 15it [00:00, 239.03it/s]
+test batch: 1it [00:00, ?it/s]
+train batch: 15it [00:00, 256.35it/s]
+test batch: 1it [00:00, 999.12it/s] [00:00<00:00, 14.52it/s]
+train epochs: 100%|██████████| 10/10 [00:00<00:00, 14.13it/s]
+train batch: 15it [00:00, 182.37it/s]5:39, 169.77s/it]
+test batch: 1it [00:00, 1016.06it/s][00:00<?, ?it/s]
+train batch: 15it [00:00, 186.31it/s]
+test batch: 1it [00:00, 500.10it/s]
+train batch: 15it [00:00, 200.76it/s]
+test batch: 1it [00:00, 493.85it/s] [00:00<00:00, 11.85it/s]
+train batch: 15it [00:00, 213.01it/s]
+test batch: 1it [00:00, 474.52it/s]
+train batch: 15it [00:00, 230.75it/s]
+test batch: 1it [00:00, 500.04it/s] [00:00<00:00, 12.54it/s]
+train batch: 15it [00:00, 215.80it/s]
+test batch: 1it [00:00, 500.04it/s]
+train batch: 0it [00:00, ?it/s]
+train epochs:  60%|██████    | 6/10 [00:00<00:00, 13.22it/s]
+train batch: 0it [00:00, ?it/s]
+epochs:1/10,test_loss:1.6809,test_acc:22.2222%
+epochs:2/10,test_loss:1.6817,test_acc:22.2222%
+epochs:3/10,test_loss:1.6822,test_acc:22.2222%
+epochs:4/10,test_loss:1.6823,test_acc:22.2222%
+epochs:5/10,test_loss:1.6824,test_acc:22.2222%
+epochs:6/10,test_loss:1.6824,test_acc:22.2222%
+epochs:7/10,test_loss:1.6825,test_acc:22.2222%
+epochs:8/10,test_loss:1.6825,test_acc:22.2222%
+epochs:9/10,test_loss:1.6825,test_acc:22.2222%
+train batch: 15it [00:00, 190.88it/s]
+test batch: 1it [00:00, 999.60it/s]
+train batch: 15it [00:00, 312.50it/s]
+test batch: 1it [00:00, 1000.07it/s][00:00<00:00, 13.08it/s]
+train batch: 15it [00:00, 218.77it/s]
+test batch: 1it [00:00, 1000.55it/s]
+train epochs: 100%|██████████| 10/10 [00:00<00:00, 13.53it/s]
+models:  80%|████████  | 4/5 [10:14<01:44, 104.06s/it]16it/s]
+train batch: 15it [00:00, 165.75it/s]1:44, 104.06s/it]16it/s]
+test batch: 1it [00:00, 499.98it/s] [00:00<?, ?it/s]
+train batch: 15it [00:00, 279.64it/s]
+test batch: 1it [00:00, 897.37it/s]
+train batch: 15it [00:00, 216.15it/s]
+test batch: 1it [00:00, 999.60it/s] [00:00<00:00, 13.40it/s]
+train batch: 15it [00:00, 215.21it/s]
+test batch: 1it [00:00, 1000.31it/s]
+train batch: 15it [00:00, 188.64it/s]
+test batch: 1it [00:00, 999.36it/s] [00:00<00:00, 13.68it/s]
+train batch: 15it [00:00, 214.26it/s]
+test batch: 1it [00:00, 999.83it/s]
+train batch: 15it [00:00, 265.43it/s]
+test batch: 1it [00:00, 999.36it/s] [00:00<00:00, 13.33it/s]
+train batch: 15it [00:00, 243.66it/s]
+test batch: 1it [00:00, 500.10it/s]
+train batch: 15it [00:00, 162.15it/s]
+test batch: 1it [00:00, 999.83it/s] [00:00<00:00, 14.27it/s]
+train batch: 15it [00:00, 205.47it/s]
+test batch: 1it [00:00, 999.83it/s]
+train epochs: 100%|██████████| 10/10 [00:00<00:00, 13.45it/s]
+models: 100%|██████████| 5/5 [10:18<00:00, 123.65s/it]24it/s]
+epochs:2/10,test_loss:1.6826,test_acc:22.2222%
+epochs:3/10,test_loss:1.6826,test_acc:22.2222%
+epochs:4/10,test_loss:1.6826,test_acc:22.2222%
+epochs:5/10,test_loss:1.6825,test_acc:22.2222%
+epochs:6/10,test_loss:1.6826,test_acc:22.2222%
+epochs:7/10,test_loss:1.6826,test_acc:22.2222%
+epochs:8/10,test_loss:1.6825,test_acc:22.2222%
+epochs:9/10,test_loss:1.6825,test_acc:22.2222%
+epochs:10/10,test_loss:1.6825,test_acc:22.2222%
+[[[[0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0]]]]
+1 9
+[[[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0]]]
+[0, 0, 1, 1, 2, 2, 3, 3, 4]
+9 9
+0.2222222222222222
