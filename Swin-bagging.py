@@ -10,9 +10,11 @@ import torchvision
 from torchvision import transforms
 from tqdm import tqdm
 import wandb
+import Bagging_Adaboosting
 import torchvision.models as models
+from classguided_sampler import class_count_guided_data_loader
 
-wandb.login(key='ddd005d13a9704b2f25fd1c6ace472b6ca714fc2')
+#wandb.login(key='ddd005d13a9704b2f25fd1c6ace472b6ca714fc2')
 
 #数据加载器
 def data_loader(data_dir,resize=None,is_category = False):
@@ -73,10 +75,13 @@ def random_balance_samples(X_samples,y_samples,n_per_datas,category=None):
     return torch.tensor(X_new_samples),torch.tensor(y_new_samples)
 
 #批量生成器
-def batch_data_loader(X_samples,y_samples,batch_size,class_weights):
+def batch_data_loader(X_samples,y_samples,batch_size,class_weights,is_shuffle=True):
     num_samples = len(X_samples)
     indices = list(range(num_samples))
-    np.random.shuffle(indices)
+    if is_shuffle:
+        np.random.shuffle(indices)
+    else:
+        pass
     for i in range(0,num_samples,batch_size):
         batch_indices = torch.tensor(indices[i:min(i+batch_size,num_samples)])
         yield X_samples[batch_indices],y_samples[batch_indices],class_weights[batch_indices]
@@ -102,56 +107,17 @@ def models_list(n_models,num_classes):
 """权值只有0和1，且纯标签后处理，权值并非模型权值"""
 def result_optimiszer_selective(workers_test_list,num_classes,class_weights):
     assert type(workers_test_list) == list and len(workers_test_list) > 0
-    probs = []
-    add_list_dict = {}
-    for i in range(len(workers_test_list)):
-        max_length = max(len(sublist) for sublist in workers_test_list[i])
-        for j in range(len(workers_test_list[i])):
-            if len(workers_test_list[i][j]) < max_length:
-                add_list_dict[f'{i},{j}'] = max_length - len(workers_test_list[i][j])
-                for _ in range(max_length - len(workers_test_list[i][j])):
-                    class_weights[i][j].append(0.0)
-                workers_test_list[i][j] += [[0] * num_classes] * (max_length - len(workers_test_list[i][j]))
-
-
-    for i in range(len(workers_test_list)):
-        probs1 = []
-        for j in range(len(workers_test_list[0])):
-            probs2 = []
-            for k in range((len(workers_test_list[0][0]))):
-                max_category = np.argmax(np.array(workers_test_list[i][j][k]))
-                probs_small = np.zeros(len(workers_test_list[i][j][k]),dtype=int)
-                probs_small[max_category] = 1
-                probs2.append(probs_small.tolist())
-            probs1.append(probs2)
-        probs.append(probs1)
-    final_predict = []
-    print(probs)
-    for i in range(len(probs[0])):
-        for j in range(len(probs[0][0])):
-            probs_0d_list = []
-            weights_0d_list = []
-            for k in range(len(probs)):
-                probs_0d_list.append(probs[k][i][j])
-                weights_0d_list.append(class_weights[k][i][j])
-            final_predict.append(weights_cal_result(weights=weights_0d_list,result_list=probs_0d_list))
-    final_predict = torch.tensor(final_predict).reshape(torch.tensor(workers_test_list[0]).shape)
-    return final_predict.tolist(),add_list_dict
-
-#bagging权值输出函数
-def weights_cal_result(weights,result_list):
-    assert type(weights) == type(result_list) == list
-    assert len(torch.tensor(weights)) == len(torch.tensor(result_list))
-    work_list = []
-    for i in range(len(weights)):
-        if weights[i] == 1:
-            work_list.append(result_list[i])
-        else:
-            continue
-    if work_list != []:
-        return work_list[0]   #返回分类正确的即可，故work_list列表所有值均相同
-    else:
-        return [0] * len(result_list[0])  #否则返回全零，放弃该类
+    assert len(workers_test_list[0]) == num_classes
+    work_list = np.zeros(torch.tensor(workers_test_list[0]).shape)
+    final_class_weights = np.zeros(torch.tensor(workers_test_list[0]).shape)
+    for i in range(len(class_weights)):
+        for j in range(len(class_weights[i])):
+            if class_weights[i][j] == 1:
+                work_list[j] = workers_test_list[i][j]
+                final_class_weights[j] = 1
+            else:
+                continue
+    return work_list,final_class_weights
 
 #bagging均权投票
 def result_optimiszer_selective_bagging_Ada(workers_test_list,num_classes):
@@ -181,26 +147,13 @@ def result_optimiszer_selective_bagging_Ada(workers_test_list,num_classes):
     return final_predict.tolist(),add_list_dict
 
 #评估器
-def final_accuacy(final_test_list,test_labels,add_list_dict):
-    for key,values in add_list_dict.items():
-        i,j = map(int,key.split(','))
-        del final_test_list[j][-values:]
-        break
+def final_accuacy(final_test_list,test_labels):
+    assert  len(final_test_list) == len(test_labels)
 
-    final_final_test_list = []
-
-    for i in range(len(final_test_list)):
-        for j in range(len(final_test_list[i])):
-            final_final_test_list.append(final_test_list[i][j])
-    print(len(test_labels),len(final_final_test_list))
-    assert type(test_labels) == type(final_final_test_list) == list
-    assert len(test_labels) == len(final_final_test_list)
-
-    final_final_test_list = torch.tensor(final_final_test_list).float()
     test_labels = torch.tensor(test_labels).float()
-    _,predicted = torch.max(final_final_test_list,dim=1)
+    final_test_list = torch.tensor(final_test_list).float()
     #_,truth = torch.max(test_labels,dim=1)
-    correct = (predicted==test_labels).sum().item()
+    correct = (final_test_list==test_labels).sum().item()
     total = len(test_labels)
     final_accuacy = correct/total
     return final_accuacy
@@ -213,13 +166,10 @@ def is_iterable(variable):
         return False
 
 #迭代器
-def data_iter_product(n_iters,epochs,models,models_request,batch_size,samples_method='balance'):
+def data_iter_product(n_iters,data_dir_train,data_dir_test,models,models_request,samples_method='balance'):
     assert type(models) == list and  n_iters == len(models) == len(models_request)
-    data_dir_train = 'C:/Users/Dumin/Desktop/dataset/train'
-    data_dir_test = 'C:/Users/Dumin/Desktop/dataset/test'
-    train_iter_list = []
-    test_iter_list = []
-
+    data_dir_train = data_dir_train
+    data_dir_test = data_dir_test
     resize_list = []
     X_samples_dict = {}
     y_samples_dict = {}
@@ -228,6 +178,12 @@ def data_iter_product(n_iters,epochs,models,models_request,batch_size,samples_me
     class_weights_train_dict = {}
     class_weights_test_dict = {}
     category_dict = {}
+    X_samples_list = []
+    y_samples_list = []
+    X_samples_test_list = []
+    y_samples_test_list = []
+    class_weights_train_list = []
+    class_weights_test_list = []
     for i in range(n_iters):
         resize_list.append(models_request[i][0])
     resize_list = set(resize_list)
@@ -256,45 +212,46 @@ def data_iter_product(n_iters,epochs,models,models_request,batch_size,samples_me
         else:
             print('train data loader error!!!')
             break
-        train_per_model_iter_list = []
-        test_per_model_iter_list = []
-        for epoch in range(epochs):
-            train_loader = batch_data_loader(
-                X_samples=X_samples,
-                y_samples=y_samples,
-                batch_size=batch_size,
-                class_weights=class_weights_train_dict[f'{models_request[models.index(model)][0]}']
-            )
+        X_samples_list.append(X_samples)
+        y_samples_list.append(y_samples)
+        class_weights_train_list.append(class_weights_train_dict[f'{models_request[models.index(model)][0]}'])
+        X_samples_test_list.append(X_samples_test_dict[f'{models_request[models.index(model)][0]}'])
+        y_samples_test_list.append(y_samples_test_dict[f'{models_request[models.index(model)][0]}'])
+        class_weights_test_list.append(class_weights_test_dict[f'{models_request[models.index(model)][0]}'])
+    return X_samples_list,y_samples_list,class_weights_train_list,X_samples_test_list,y_samples_test_list,class_weights_test_list
 
-            test_loader = batch_data_loader(
-                X_samples=X_samples_test_dict[f'{models_request[models.index(model)][0]}'],
-                y_samples=y_samples_test_dict[f'{models_request[models.index(model)][0]}'],
-                batch_size=batch_size,
-                class_weights=class_weights_test_dict[f'{models_request[models.index(model)][0]}']
-            )
-            train_per_model_iter_list.append(train_loader)
-            test_per_model_iter_list.append(test_loader)
-        train_iter_list.append(train_per_model_iter_list)
-        test_iter_list.append(test_per_model_iter_list)
-    return train_iter_list,test_iter_list
+def SMMAE_enhance(X,y,class_weights_train,X_test,y_test,class_weights_test,B,model,losser,optimizer,epochs,batch_size,cuda_ids=None):
+    pred,class_test_weight_pred = Bagging_Adaboosting.SMMAE(
+        X=X,
+        y=y,
+        class_weights_train=class_weights_train,
+        X_test=X_test,
+        y_test=y_test,
+        class_weights_test=class_weights_test,
+        B=B,
+        model=model,
+        losser=losser,
+        optimizer=optimizer,
+        epochs=epochs,
+        batch_size=batch_size,
+        cuda_ids=cuda_ids
+    )
+    return pred,class_test_weight_pred
 
-def train_model(n_base_models,n_samples,epochs,batch_size,lr,weight_decay,num_classes,cuda_id=None):
+def train_model(data_dir_train,data_dir_test,n_base_models,n_samples,epochs,batch_size,B,lr,weight_decay,num_classes,cuda_id=None):
     assert n_base_models == n_samples
     models,models_request = models_list(n_base_models,num_classes=num_classes)
     test_labels_list = []
     test_labels_class_weights = []
     for model in tqdm(models,desc='models'):
+        print(' ')
+        """
         wandb.log({
             'model':model,
             'model_index':models.index(model),
         })
+        """
         model_index = models.index(model)
-        if cuda_id is not None:
-            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            model = nn.DataParallel(model,device_ids=cuda_id).to(device)
-        else:
-            device = torch.device( 'cpu')
-        test_one_model = []
         test_one_class_weights = []
         loss = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(
@@ -302,182 +259,35 @@ def train_model(n_base_models,n_samples,epochs,batch_size,lr,weight_decay,num_cl
             lr=lr,
             weight_decay=weight_decay
         )
-        train_loader,test_loader = data_iter_product(
+        X_samples,y_samples,class_weights_train,X_samples_test,y_samples_test,class_weights_test = data_iter_product(
             n_iters=n_base_models,
-            epochs=epochs,
+            data_dir_train=data_dir_train,
+            data_dir_test=data_dir_test,
             models=models,
             models_request=models_request,
-            batch_size=batch_size,
             samples_method='bootstrap'
         )
-        for epoch in tqdm(range(epochs),desc='train epochs'):
-            train_total = 0
-            train_correct = 0
-            train_iter = iter(train_loader[model_index][epoch])
-            for X,y,class_weights_train_batch in tqdm(train_iter,desc='train batch'):
-                model.train()
-                optimizer.zero_grad()
-                if cuda_id is not None:
-                    X ,y,class_weights_train_batch= X.to(device),y.to(device),class_weights_train_batch.to(device)
-                    y_hat = model(X)
-                    train_loss = loss(y_hat,y)
-                else:
-                    y_hat = model(X)
-                    train_loss = loss(y_hat,y)
-                train_loss.backward()
-                train_total += y.shape[0]
-                _,predicted = torch.max(y_hat.data,1)
-                for i in range(len(y_hat)):
-                    if predicted[i]==y[i]:
-                        class_weights_train_batch[i] = 1
-                    else:
-                        class_weights_train_batch[i] = 0
-                #_,truth = torch.max(y.data,1)
-                train_correct += (predicted==y).sum().item()
-                optimizer.step()
-            train_acc_global = 100.* train_correct / train_total
+        test_one_model,test_one_class_weights  = SMMAE_enhance(
+                            X=X_samples[model_index],
+                            y=y_samples[model_index],
+                            class_weights_train=class_weights_train[model_index],
+                            X_test=X_samples_test[model_index],
+                            y_test=y_samples_test[model_index],
+                            class_weights_test = class_weights_test[model_index],
+                            B=B,
+                            model=model,
+                            losser=loss,
+                            optimizer=optimizer,
+                            epochs=epochs,
+                            batch_size=batch_size,
+                            cuda_ids=cuda_id
+                            )
 
-            wandb.log({
-                'epoch':epoch+1,
-                'train_loss': train_loss.item(),
-                'train_acc': train_acc_global/100
-                       })
-
-            model.eval()
-            with torch.no_grad():
-                correct = 0
-                total = 0
-                y_hat_list = []
-                test_one_class_weights_temp = []
-                test_accuacy_list = [0]
-                test_iter = iter(test_loader[model_index][epoch])
-                for X,y,class_weights_test_batch in tqdm(test_iter,desc='test batch'):
-                    if cuda_id is not None:
-                        X,y,class_weights_test_batch = X.to(device),y.to(device),class_weights_test_batch.to(device)
-                    else:
-                        X,y,class_weights_test_batch=X,y,class_weights_test_batch
-                    y_hat = model(X)
-                    test_loss = loss(y_hat,y)
-                    y_hat_list.append(y_hat.tolist())
-                    _,predicted = torch.max(y_hat.data,1)
-                    for i in range(len(y_hat)):
-                        if predicted[i] == y[i]:
-                            class_weights_test_batch[i] = 1
-                        else:
-                            class_weights_test_batch[i] = 0
-                    test_one_class_weights_temp.append(class_weights_test_batch.tolist())
-                    #_, truth = torch.max(y.data, 1)
-                    total += y.shape[0]
-                    correct += (predicted==y).sum().item()
-                test_accuacy = correct / total
-                test_accuacy_list.append(test_accuacy)
-                if all(test_accuacy >= x for x in test_accuacy_list):
-                    test_one_model = y_hat_list
-                    test_one_class_weights = test_one_class_weights_temp
-                else:
-                    pass
-                wandb.log({
-                    'test_loss': test_loss.item(),
-                    'test_acc': correct / total
-                })
-            print(f'epochs:{epoch+1}/{epochs},test_loss:{test_loss:.4f},test_acc:{correct/total*100:.4f}%')
-    test_labels_list.append(test_one_model)
-    test_labels_class_weights.append(test_one_class_weights)
-    return result_optimiszer_selective(test_labels_list,num_classes=len(test_labels_list[0][0][0]),class_weights=test_labels_class_weights)
-
-if __name__ == '__main__':
-    torch.multiprocessing.freeze_support()  #Linux系统不需要
-    batch_size = 16
-    n_base_model = 5
-    n_samples = 5
-    lr = 1e-4
-    weight_decay = 1e-4
-    cuda_id = [0]#[0,1,2,3,4,5,6,7]
-    max_epochs = 10
-    num_classes = 5687
-    wandb.init(
-        project='Bagging',
-        name='bagging10',
-        config=wandb.config,
-    )
-
-    wandb.config.update({
-        'n_base_model': n_base_model,
-        'n_samples': n_samples,
-        'max_lr': lr,
-        'weight_decay': weight_decay,
-        'cuda_id': cuda_id,
-        'max_epochs': max_epochs,
-    })
-
-    result,add_list_dict = train_model(
-        n_base_models=n_base_model,
-        n_samples=n_samples,
-        epochs=max_epochs,
-        batch_size=batch_size,
-        lr=lr,weight_decay=weight_decay,
-        num_classes=num_classes,
-        cuda_id=cuda_id,
-    )
-
-    _,test_labels,_,_ = data_loader(
-        data_dir='C:/Users/Dumin/Desktop/dataset/test',
-        resize=(28,28),
-        is_category=True
-    )
-    test_labels = test_labels.tolist()
-    print(len(result),len(test_labels))
-    print(result)
-    print(test_labels)
-    final_accuacy_test = final_accuacy(
-        final_test_list=result,
-        test_labels=test_labels,
-        add_list_dict=add_list_dict
-    )
-    print(final_accuacy_test)
-    wandb.log({
-        'final_acc':final_accuacy_test
-    })
-    wandb.finish()
-    #wandb.save('result.pkl')
-
-
-"""
-test_list = [
-    [
-        [[1,0,0,0,0],[0,0,0,1,0]],
-        [[0,1,0,0,0],[1,0,0,0,0]],
-        [[1,0,0,0,0],[0,0,1,0,0]],
-    ],
-    [
-        [[0,0,0,0,1],[1,0,0,0,0]],
-        [[0,1,0,0,0],[0,1,0,0,0]],
-        [[1,0,0,0,0],[0,0,0,0,1]],
-    ],
-    [
-        [[0,1,0,0,0],[1,0,0,0,0]],
-        [[0,0,0,0,1],[0,0,0,0,1]],
-        [[1,0,0,0,0],[0,1,0,0,0]],
-    ],
-]
-test_weights = [
-    [
-        [1,0],
-        [1,0],
-        [0,1],
-    ],
-    [
-        [0,1],
-        [1,1],
-        [0,1],
-    ],
-    [
-        [1,1],
-        [1,0],
-        [0,0]
-    ],
-]
-print(result_optimiszer_selective_bagging(test_list,5))
-print(result_optimiszer_selective(test_list,5,test_weights))
-"""
-
+        test_labels_list.append(test_one_model)
+        test_labels_class_weights.append(test_one_class_weights)
+        print(torch.tensor(test_labels_list))
+    return result_optimiszer_selective(
+                                        test_labels_list,
+                                        num_classes=len(test_labels_list[0]),
+                                        class_weights=test_labels_class_weights
+                                        )
